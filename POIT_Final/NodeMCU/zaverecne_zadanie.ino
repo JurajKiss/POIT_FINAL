@@ -1,45 +1,38 @@
-const int trigPin = 12;
-const int echoPin = 14;
-
-//define sound velocity in cm/uS
-#define SOUND_VELOCITY 0.034
-#define CM_TO_INCH 0.393701
-
-
+bool generate = false;
 
 void setup() {
   Serial.begin(9600); // Starts the serial communication
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW); 
+
+  pinMode(A0, INPUT);
+  
+  pinMode(D0, OUTPUT);
 }
 
 void loop() {
+  int randomValue = analogRead(A0); // Read the potentiometer value
+  
+  if (generate) {
+    Serial.print("Sending ");
+    Serial.println(randomValue);
+  }
+  
+  if (Serial.available() > 0) {
+    String inputMessage = Serial.readString();
 
-  digitalWrite(LED_BUILTIN, HIGH);
-  int randomValue = random(100);
-                   
-  Serial.print("Sending ");
-  Serial.println(randomValue);
-
-  if (Serial.available() > 0) { // Check if there's any data available to read
-    String inputMessage = Serial.readString(); // Read the incoming message as a String
-
-    if (inputMessage.indexOf("Light") >= 0) { // Check if the message contains "Light"
-      functionA(); // Call function A if "Light" is found
-    } else if (inputMessage.indexOf("Sensor") >= 0) { // Check if the message contains "Sensor"
-      functionB(); // Call function B if "Sensor" is found
+    if (inputMessage.indexOf("Light") >= 0) {
+      GenerateSwitch();
     }
   }
-
-  delay(1000); // Small delay to allow for stable serial communication
+  
+  
+  delay(500);
 }
 
-void functionA() {
-  Serial.println("Function A is running"); // Placeholder for what Function A does
-  // Add your code for Function A here
-}
-
-void functionB() {
-  Serial.println("Function B is running"); // Placeholder for what Function B does
-  // Add your code for Function B here
+void GenerateSwitch() {
+  generate = !generate;
+  if (generate){
+    digitalWrite(D0, HIGH);
+  } else{
+    digitalWrite(D0, LOW);
+  }
 }
