@@ -1,0 +1,172 @@
+<!doctype html>                                   
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>jQuery UI Tabs - Open on mouseover</title>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.min.js"></script>
+    <script src="static/jquery-3.2.1.min.js"></script>
+    <script src="static/jquery-ui.min.js"></script>
+    <script src="static/plotly-latest.min.js"></script>
+    <script src="static/gauge.min.js"></script>
+    
+    <link rel="stylesheet" href="static/jquery-ui.min.css">
+      
+    <script>
+      $( function() {
+        $( "#tabs" ).tabs({
+          event: "mouseover"
+        });
+      } );
+    </script>
+    <script type="text/javascript" charset="utf-8">
+     $(document).ready(function() {  
+      var generate = false;
+      var jsonData = [];  
+      var x = new Array();
+      var y = new Array();
+      var trace;
+      var layout;
+      
+      var gauge = new RadialGauge({
+          renderTo: 'canvasID',
+          width: 300,
+          height: 300,
+          units: "Potentiometer",
+          minValue: 0,
+          maxValue: 1024,
+          majorTicks: [
+              "0",
+              "64",
+              "128",
+              "196",
+              "256",
+              "320",
+              "384",
+              "448",
+              "512",
+              "576",
+              "640",
+              "704",
+              "768",
+              "812",
+              "896",
+              "960",
+              "1024"
+          ],
+          minorTicks: 2,
+          strokeTicks: true,
+          highlights: [
+              {
+                  "from": 812,
+                  "to": 1024,
+                  "color": "rgba(200, 50, 50, .75)"
+              }
+          ],
+          colorPlate: "#fff",
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: "arrow",
+          needleWidth: 2,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          animationDuration: 500,
+          animationRule: "linear"
+      });
+      gauge.draw();
+      gauge.value = "0";
+      
+      namespace = '/test';
+      var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+      socket.on('connect', function() {
+        socket.emit('my_event', {data: 'I\'m connected!', value: 1}); });
+
+      socket.on('my_response', function(msg) {        
+        console.log(msg.data);
+        
+        var jsonItem = {
+          Data: msg.data,
+          Count: msg.count
+          };
+        
+        jsonData.push(jsonItem)
+        
+        $('#log').append(JSON.stringify(jsonItem)+'<br>').html();
+        
+        gauge.value = msg.data;  
+        
+        x.push(parseFloat(msg.count));
+        y.push(parseFloat(msg.data));
+        trace = {
+            x: x,
+            y: y,
+        };
+        layout = {
+          title: 'Data',
+          xaxis: {
+              title: 'x',
+          },
+          yaxis: {
+              title: 'y',
+          }
+        };
+        console.log(trace);
+        var traces = new Array();
+        traces.push(trace);
+        Plotly.newPlot($('#plotdiv')[0], traces, layout); 
+        //addTraces               
+        });
+      
+      $('form#generate').submit(function(event) {
+          generate = !generate;
+          
+          if (generate)
+            document.getElementById("generateBTN").innerHTML = "Turn Off";
+          else 
+            document.getElementById("generateBTN").innerHTML = "Turn On";
+            
+          socket.emit('generate_request');
+          return false; });
+      
+      $('form#disconnect').submit(function(event) {
+          socket.emit('disconnect_request');
+          return false; });         
+      });
+    </script>
+  </head>
+  <body>
+   
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">Nunc tincidunt</a></li>
+        <li><a href="#tabs-2">Proin dolor</a></li>
+        <li><a href="#tabs-3">Aenean lacinia</a></li>
+      </ul>
+      
+      <div id="tabs-1">
+        <h2>Receive:</h2>
+        <div id="log"></div>
+      </div>
+      
+      <div id="tabs-2">
+        <div id="plotdiv" style="width:600px;height:250px;"></div>
+      </div>
+      
+      <div id="tabs-3">
+        <canvas id="canvasID"></canvas>
+      </div>
+    </div>
+    
+    <form id="generate" method="POST" action='#'>
+      <button type="submit" id="generateBTN" value="generate">Turn On</button>
+    </form>
+    
+    <form id="disconnect" method="POST" action="#">
+      <input type="submit" value="Disconnect">
+    </form> 
+ 
+ 
+ 
+  </body>
+</html>
