@@ -9,11 +9,11 @@ void setup() {
 }
 
 void loop() {
-  int randomValue = analogRead(A0); // Read the potentiometer value
+  int potenValue = analogRead(A0); // Read the potentiometer value
   
   if (generate) {
     Serial.print("Sending ");
-    Serial.println(randomValue);
+    Serial.println(potenValue);
   }
   
   if (Serial.available() > 0) {
@@ -23,9 +23,6 @@ void loop() {
       GenerateSwitch();
     }
   }
-  
-  
-  delay(500);
 }
 
 void GenerateSwitch() {
