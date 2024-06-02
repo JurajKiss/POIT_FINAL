@@ -74,4 +74,4 @@ Projekt je rozdelený do troch hlavných častí:
 
 ## Licencia
 
-Tento projekt je licencovaný pod MIT licenciou - viď súbor [LICENSE](LICENSE) pre detaily.
+Tento projekt je licencovaný pod MIT licenciou - viď súbor [LICENSE.md](LICENSE.md) pre detaily.
