@@ -72,10 +72,6 @@ Projekt je rozdelený do troch hlavných častí:
 - **Klient**: HTML, CSS, JavaScript
 - **Kód mikrokontroléra**: C/C++
 
-## Prispievanie
-
-Príspevky sú vítané! Prosím, forknete tento repozitár a pošlite pull request s vašimi vylepšeniami.
-
 ## Licencia
 
 Tento projekt je licencovaný pod MIT licenciou - viď súbor [LICENSE](LICENSE) pre detaily.
